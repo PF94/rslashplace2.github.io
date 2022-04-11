@@ -353,7 +353,7 @@
 		})
 		const CHAT_COLOURS = ["lightblue", "lightseagreen", "lightpink", "lightcoral", "lightsalmon", "lightgreen", "gold"]
 		let online = 1
-		let ws = new WebSocket('wss://server.rplace.tk:443')
+		let ws = new WebSocket('ws://127.0.0.1:1234')
 		ws.onmessage = async function({data}){
 			data = new DataView(await data.arrayBuffer())
 			let code = data.getUint8(0)

@@ -2,7 +2,7 @@
 import {WebSocketServer} from 'ws'
 import {promises as fs} from 'fs'
 import {createServer} from 'https'
-let SECURE = true
+let SECURE = false
 let BOARD, CHANGES
 
 //TODO: compress changes
@@ -55,7 +55,7 @@ function runLengthChanges(){
 	bufs[blast] = bufs[blast].slice(0,bi)
 	return Buffer.concat(bufs)
 }
-const PORT = 443
+const PORT = 1234
 if(SECURE){
 	wss = new WebSocketServer({ perMessageDeflate: false, server: createServer({
 	cert: await fs.readFile('../a.pem'), //etc/letsencrypt/live/server.rplace.tk/fullchain.pem'),
@@ -66,7 +66,10 @@ let players = 0
 let BANS = new Set(await fs.readFile('blacklist.txt').toString().split('\n'))
 wss.on('connection', async function(p, {headers}) {
 	let IP = /*p._socket.remoteAddress */headers['x-forwarded-for']
-	if(!IP)return p.close()
+	//if(!IP) {
+	//	console.log(IP)
+	//}
+	console.log(IP)
 	p.lchat = 0
 	let buf = Buffer.alloc(5)
 	buf[0] = 1
@@ -76,6 +79,7 @@ wss.on('connection', async function(p, {headers}) {
 	p.send(runLengthChanges())
   p.on("error", _=>_)
   p.on('message', function(data) {
+	  console.log("fuck")
 		if(data[0] == 15){
 			if(p.lchat + 2500 > NOW || data.length > 400)return
 			p.lchat = NOW
@@ -113,10 +117,10 @@ setInterval(() => {
 
 import { exec } from 'child_process'
 
-let ORIGIN = (''+await fs.readFile("../.git-credentials")).trim()
+//let ORIGIN = (''+await fs.readFile("../.git-credentials")).trim()
 
 async function pushImage(){
-	await new Promise((r, t) => exec("git add *;git commit -a -m 'Hourly backup';git push --force "+ORIGIN+"/rslashplace2/rslashplace2.github.io", e => e ? t(e) : r()))
+	//await new Promise((r, t) => exec("git add *;git commit -a -m 'Hourly backup';git push --force "+ORIGIN+"/rslashplace2/rslashplace2.github.io", e => e ? t(e) : r()))
 	//serve old changes for 11 more mins just to be 100% safe
 	let curr = new Uint8Array(CHANGES)
 	setTimeout(() => {
